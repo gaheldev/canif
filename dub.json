@@ -1,0 +1,70 @@
+{
+    "$schema": "https://raw.githubusercontent.com/Pure-D/code-d/master/json-validation/dub.schema.json",
+
+    "name": "clipit",
+
+    "license": "public domain",
+    "importPaths": [ "." ],
+    "sourcePaths": [ "." ],
+    "stringImportPaths": ["gfx", "."],
+
+    "copyright": "none",
+
+    "dflags-linux-dmd": ["-defaultlib=libphobos2.a"],
+    "dflags-osx-ldc": ["-static"],
+    "dflags-linux-ldc": ["-link-defaultlib-shared=false"],
+    "dflags-linux-x86_64-ldc": ["-fvisibility=hidden"],
+    "dflags-windows-ldc": ["-mscrtlib=libcmt","-fvisibility=hidden", "-link-defaultlib-shared=false"],
+
+    "comment-WARNING-READ-THIS-IS-IMPORTANT": [
+        "    When making your own plug-in you have to CHANGE THESE DEPENDENCY    ",
+        "    SPECIFICATIONS below from path-based to ~>MAJOR.MINOR               ",
+        "      Example: ~>7.0                                                    ",
+        "    This way you can move the project out of the Dplug tree.            ",
+        "    See also the DUB documentation:                                     ",
+        "         https://code.dlang.org/package-format?lang=json#version-specs  "],
+    "dependencies":
+    {
+        "dplug:dsp": { "path": "/home/gael/code/audio/Dplug/" },
+        "dplug:vst2": { "path": "/home/gael/code/audio/Dplug/" },
+        "dplug:lv2": { "path": "/home/gael/code/audio/Dplug/"},
+        "dplug:au": { "path": "/home/gael/code/audio/Dplug/" },
+        "dplug:vst3": { "path": "/home/gael/code/audio/Dplug/" },
+        "dplug:gui": { "path": "/home/gael/code/audio/Dplug/" },
+        "dplug:canvas": { "path": "/home/gael/code/audio/Dplug/" },
+        "dplug:flat-widgets": { "path": "/home/gael/code/audio/Dplug/" }
+    },
+
+    "comment": "Example of configuration options",
+    "versions": ["futureVST2Chunks"],
+
+    "configurations": [
+        {
+            "name": "VST3",
+            "versions": ["VST3"],
+            "targetType": "dynamicLibrary",
+            "lflags-osx-ldc": [ "-exported_symbols_list", "module-vst3.lst", "-dead_strip" ],
+            "lflags-linux-ldc": [ "--version-script=module-vst3.ver" ]
+        },
+        {
+            "name": "VST2",
+            "versions": ["VST2"],
+            "targetType": "dynamicLibrary",
+            "lflags-osx-ldc": [ "-exported_symbols_list", "module-vst2.lst", "-dead_strip" ],
+            "lflags-linux-ldc": [ "--version-script=module-vst2.ver" ]
+        },
+        {
+            "name": "AU",
+            "versions": ["AU"],
+            "targetType": "dynamicLibrary",
+            "lflags-osx-ldc": [ "-exported_symbols_list", "module-au.lst", "-dead_strip" ]
+        },
+        {
+            "name": "LV2",
+            "versions": ["LV2"],
+            "targetType": "dynamicLibrary",
+            "lflags-osx-ldc": [ "-exported_symbols_list", "module-lv2.lst", "-dead_strip" ],
+            "lflags-linux-ldc": [ "--version-script=module-lv2.ver" ]
+        }
+    ]
+}

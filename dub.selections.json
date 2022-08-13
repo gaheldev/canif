@@ -1,0 +1,7 @@
+{
+	"fileVersion": 1,
+	"versions": {
+		"dplug": {"path":"/home/gael/code/audio/Dplug/"},
+		"intel-intrinsics": "1.10.2"
+	}
+}
