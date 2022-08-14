@@ -11,6 +11,7 @@ import dplug.client;
 import dplug.canvas;
 
 import main;
+import visualizer;
 
 // Plugin GUI, based on FlatBackgroundGUI.
 // This allows to use knobs rendered with Knobman
@@ -64,6 +65,9 @@ nothrow:
         _mixKnob = mallocNew!UIFilmstripKnob(context(), cast(FloatParameter) _client.param(paramMix), knobImage, numFrames);
         addChild(_mixKnob);
 
+        _visualizer = mallocNew!UIVisualizer(context(), cast(FloatParameter) _client.param(paramClip));
+        addChild(_visualizer);
+
         addChild(_modeSwitch = mallocNew!UIImageSwitch(context(), cast(BoolParameter) _client.param(paramMode), switchOnImage, switchOffImage));       
 
         addChild(_resizerHint = mallocNew!UIWindowResizer(context()));        
@@ -82,6 +86,8 @@ nothrow:
         _clipKnob.position       = rectangle(308, 101, 128, 128).scaleByFactor(S);
         _outputGainKnob.position = rectangle(70, 320, 128, 128).scaleByFactor(S);
         _mixKnob.position        = rectangle(308, 320, 128, 128).scaleByFactor(S);
+
+        _visualizer.position = rectangle(40, 215, 370, 220).scaleByFactor(S);
  
         _modeSwitch.position = rectangle(380, 28, 50, 20).scaleByFactor(S);
         _resizerHint.position = rectangle(W-30, H-30, 30, 30);
@@ -94,4 +100,5 @@ private:
     UIFilmstripKnob _mixKnob;
     UIImageSwitch   _modeSwitch;
     UIWindowResizer _resizerHint;
+    UIVisualizer    _visualizer;
 }
