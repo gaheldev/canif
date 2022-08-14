@@ -51,7 +51,8 @@ nothrow:
 
             // Fill with dark color
             canvas.fillStyle = "rgba(238, 124, 62, 90%)";
-            canvas.fillRect(0, lineH, position.width, lineWidth);
+            canvas.fillRect(0, lineH, W, lineWidth);
+            canvas.fillRect(0, H-lineH, W, -lineWidth);
         }
     }
 
