@@ -37,7 +37,8 @@ nothrow:
         _clippingAmount.addListener(this);
         _inputFIFO.initialize(SAMPLES_IN_FIFO,INPUT_SUBSAMPLING);
         _outputFIFO.initialize(SAMPLES_IN_FIFO,INPUT_SUBSAMPLING);
-        _stateToDisplay[] = 0.0f;
+        _inputStateToDisplay[] = 0.0f;
+        _outputStateToDisplay[] = 0.0f;
     }
 
     ~this()
@@ -48,7 +49,8 @@ nothrow:
     override void onAnimate(double dt, double time)
     {
         bool needRedraw = false;
-        int nbSamples = _inputFIFO.readOldestDataAndDropSome(_stateToDisplay[], dt, READ_OVERSAMPLING);
+        int nbSamples = _inputFIFO.readOldestDataAndDropSome(_inputStateToDisplay[], dt, READ_OVERSAMPLING);
+        _outputFIFO.readOldestDataAndDropSome(_outputStateToDisplay[], dt, READ_OVERSAMPLING);
         if (nbSamples)
         {
             needRedraw = true;
@@ -85,16 +87,24 @@ nothrow:
             canvas.fillRect(0, H-lineH, W, -lineWidth);
 
             /// draw waveform
-            canvas.fillStyle = RGBA(102,153,255,255);
+            canvas.fillStyle = RGBA(102,153,255,200);
             for (int i=0; i<READ_OVERSAMPLING; i++)
             {
-                float sample = _stateToDisplay[i];
+                float sample = _inputStateToDisplay[i];
                 float maxH = center - sample * H/2;
                 float minH = center + sample * H/2;
                 float chunkX = i * wavChunkWidth;
 
-                //sprintf(buf.ptr, "max = %f, min = %f, sample = %f", maxH, minH, sample);
-                //debugLog(buf.ptr);
+                canvas.fillRect(chunkX, maxH, wavChunkWidth, minH-maxH);
+            }
+            canvas.fillStyle = RGBA(153,102,255,200);
+            for (int i=0; i<READ_OVERSAMPLING; i++)
+            {
+                float sample = _outputStateToDisplay[i];
+                float maxH = center - sample * H/2;
+                float minH = center + sample * H/2;
+                float chunkX = i * wavChunkWidth;
+
                 canvas.fillRect(chunkX, maxH, wavChunkWidth, minH-maxH);
             }
         }
@@ -133,5 +143,6 @@ private:
     FloatParameter _clippingAmount;
     TimedFIFO!float _inputFIFO;
     TimedFIFO!float _outputFIFO;
-    float[READ_OVERSAMPLING] _stateToDisplay;
+    float[READ_OVERSAMPLING] _inputStateToDisplay;
+    float[READ_OVERSAMPLING] _outputStateToDisplay;
 }
