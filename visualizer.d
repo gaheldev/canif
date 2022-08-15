@@ -73,8 +73,6 @@ nothrow:
         float lineWidth = H * 0.01f;
         float lineH = (center-lineWidth) * _clippingAmount.getNormalized();
 
-        float wavChunkWidth = W / READ_OVERSAMPLING;
-
         foreach (dirtyRect; dirtyRects)
         {
             auto cRaw = rawMap.cropImageRef(dirtyRect);
@@ -87,26 +85,27 @@ nothrow:
             canvas.fillRect(0, H-lineH, W, -lineWidth);
 
             /// draw waveform
-            canvas.fillStyle = RGBA(102,153,255,200);
-            for (int i=0; i<READ_OVERSAMPLING; i++)
-            {
-                float sample = _inputStateToDisplay[i];
-                float maxH = center - sample * H/2;
-                float minH = center + sample * H/2;
-                float chunkX = i * wavChunkWidth;
+            _drawWaveform(_inputStateToDisplay[], RGBA(102,153,255,200));
+            _drawWaveform(_outputStateToDisplay[], RGBA(153,102,255,200));
+        }
+    }
 
-                canvas.fillRect(chunkX, maxH, wavChunkWidth, minH-maxH);
-            }
-            canvas.fillStyle = RGBA(153,102,255,200);
-            for (int i=0; i<READ_OVERSAMPLING; i++)
-            {
-                float sample = _outputStateToDisplay[i];
-                float maxH = center - sample * H/2;
-                float minH = center + sample * H/2;
-                float chunkX = i * wavChunkWidth;
+    void _drawWaveform(float[] stateToDisplay, RGBA fillStyle)
+    {
+        float W = position.width;
+        float H = position.height;
+        float center = H * 0.5f;
+        float wavChunkWidth = W / READ_OVERSAMPLING;
 
-                canvas.fillRect(chunkX, maxH, wavChunkWidth, minH-maxH);
-            }
+        canvas.fillStyle = fillStyle;
+        for (int i=0; i<READ_OVERSAMPLING; i++)
+        {
+            float sample = stateToDisplay[i];
+            float maxH = center - sample * H/2;
+            float minH = center + sample * H/2;
+            float chunkX = i * wavChunkWidth;
+
+            canvas.fillRect(chunkX, maxH, wavChunkWidth, minH-maxH);
         }
     }
 
