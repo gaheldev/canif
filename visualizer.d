@@ -96,15 +96,27 @@ nothrow:
         float wavChunkWidth = W / SAMPLES_IN_FIFO;
 
         canvas.fillStyle = fillStyle;
+        canvas.beginPath();
+        canvas.moveTo(0,center);
         for (int i=0; i<SAMPLES_IN_FIFO; i++)
         {
             float sample = stateToDisplay[i];
             float maxH = center - sample * H/2;
+            //float minH = center + sample * H/2;
+            float chunkX = i * wavChunkWidth;
+            canvas.lineTo(chunkX,maxH);
+        }
+        canvas.lineTo(W,center);
+
+        for (int i=SAMPLES_IN_FIFO-1; i>=0; i--)
+        {
+            float sample = stateToDisplay[i];
             float minH = center + sample * H/2;
             float chunkX = i * wavChunkWidth;
-
-            canvas.fillRect(chunkX, maxH, wavChunkWidth, minH-maxH);
+            canvas.lineTo(chunkX,minH);
         }
+        canvas.closePath();
+        canvas.fill();
     }
 
     override void onParameterChanged(Parameter sender)
