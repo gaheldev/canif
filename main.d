@@ -26,6 +26,8 @@ enum : int
     paramMode,
 }
 
+enum MAX_FRAMES_IN_PROCESS = 256;
+
 
 /// Example mono/stereo distortion plugin.
 final class ClipperClient : dplug.client.Client
@@ -84,20 +86,20 @@ nothrow:
     // Buffer splitting also allows to allocate statically or on the stack with less worries.
     override int maxFramesInProcess()
     {
-        return 512;
+        return MAX_FRAMES_IN_PROCESS;
     }
 
     override void reset(double sampleRate, int maxFrames, int numInputs, int numOutputs) 
     {
         // Clear here any state and delay buffers you might have.
-        assert(maxFrames <= 512); // guaranteed by audio buffer splitting
+        assert(maxFrames <= MAX_FRAMES_IN_PROCESS); // guaranteed by audio buffer splitting
 
         _sampleRate = sampleRate;
     }
 
     override void processAudio(const(float*)[] inputs, float*[]outputs, int frames, TimeInfo info)
     {
-        assert(frames <= 512); // guaranteed by audio buffer splitting
+        assert(frames <= MAX_FRAMES_IN_PROCESS); // guaranteed by audio buffer splitting
 
         int numInputs = cast(int)inputs.length;
         int numOutputs = cast(int)outputs.length;

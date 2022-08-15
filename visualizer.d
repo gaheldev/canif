@@ -26,9 +26,8 @@ public:
 nothrow:
 @nogc:
 
-    enum SAMPLES_IN_FIFO = 256;
+    enum SAMPLES_IN_FIFO = 512;
     enum INPUT_SUBSAMPLING = 1;
-    enum READ_OVERSAMPLING = 256;
 
     this(UIContext context, Parameter clippingAmount)
     {
@@ -49,9 +48,9 @@ nothrow:
     override void onAnimate(double dt, double time)
     {
         bool needRedraw = false;
-        int nbSamples = _inputFIFO.readOldestDataAndDropSome(_inputStateToDisplay[], dt, READ_OVERSAMPLING);
-        _outputFIFO.readOldestDataAndDropSome(_outputStateToDisplay[], dt, READ_OVERSAMPLING);
-        if (nbSamples)
+        int nbSamplesInput  = _inputFIFO.readOldestDataAndDropSome(_inputStateToDisplay[], dt, SAMPLES_IN_FIFO);
+        int nbSamplesOutput = _outputFIFO.readOldestDataAndDropSome(_outputStateToDisplay[], dt, SAMPLES_IN_FIFO);
+        if (nbSamplesInput)
         {
             needRedraw = true;
         }
@@ -79,7 +78,6 @@ nothrow:
             canvas.initialize(cRaw);
             canvas.translate(-dirtyRect.min.x, -dirtyRect.min.y);
 
-            // Fill with dark color
             canvas.fillStyle = "rgba(238, 124, 62, 90%)";
             canvas.fillRect(0, lineH, W, lineWidth);
             canvas.fillRect(0, H-lineH, W, -lineWidth);
@@ -95,10 +93,10 @@ nothrow:
         float W = position.width;
         float H = position.height;
         float center = H * 0.5f;
-        float wavChunkWidth = W / READ_OVERSAMPLING;
+        float wavChunkWidth = W / SAMPLES_IN_FIFO;
 
         canvas.fillStyle = fillStyle;
-        for (int i=0; i<READ_OVERSAMPLING; i++)
+        for (int i=0; i<SAMPLES_IN_FIFO; i++)
         {
             float sample = stateToDisplay[i];
             float maxH = center - sample * H/2;
@@ -126,9 +124,9 @@ nothrow:
 
     void sendFeedbackToUI(float max_input, float max_output, int frames, float sampleRate)
     {
-        /// simulate 512 samples -> 9.8s for 48kHz and FIFO of 1024 samples
-        assert(frames <= 512);
-        int nbDuplicates = 512 / frames;
+        /// simulate 512 samples -> 2.7s for 48kHz and FIFO of 512 samples
+        assert(frames <= 256);
+        int nbDuplicates = 256 / frames;
 
         for (int i=0; i<nbDuplicates; i++)
         {
@@ -142,6 +140,6 @@ private:
     FloatParameter _clippingAmount;
     TimedFIFO!float _inputFIFO;
     TimedFIFO!float _outputFIFO;
-    float[READ_OVERSAMPLING] _inputStateToDisplay;
-    float[READ_OVERSAMPLING] _outputStateToDisplay;
+    float[SAMPLES_IN_FIFO] _inputStateToDisplay;
+    float[SAMPLES_IN_FIFO] _outputStateToDisplay;
 }
