@@ -15,7 +15,7 @@ import gui;
 
 // This define entry points for plugin formats, 
 // depending on which version identifiers are defined.
-mixin(pluginEntryPoints!ClipitClient);
+mixin(pluginEntryPoints!ClipperClient);
 
 enum : int
 {
@@ -28,7 +28,7 @@ enum : int
 
 
 /// Example mono/stereo distortion plugin.
-final class ClipitClient : dplug.client.Client
+final class ClipperClient : dplug.client.Client
 {
 public:
 nothrow:
@@ -90,8 +90,9 @@ nothrow:
     override void reset(double sampleRate, int maxFrames, int numInputs, int numOutputs) 
     {
         // Clear here any state and delay buffers you might have.
-
         assert(maxFrames <= 512); // guaranteed by audio buffer splitting
+
+        _sampleRate = sampleRate;
     }
 
     override void processAudio(const(float*)[] inputs, float*[]outputs, int frames, TimeInfo info)
@@ -159,22 +160,26 @@ nothrow:
         for (int chan = minChan; chan < numOutputs; ++chan)
             outputs[chan][0..frames] = 0; // D has array slices assignments and operations
 
+        _max_input  = inputs[0][0..frames].maxElement();
+        _max_output = outputs[0][0..frames].maxElement();
+
         /// Get access to the GUI
-        if (ClipitGUI gui = cast(ClipitGUI) graphicsAcquire())
+        if (ClipperGUI gui = cast(ClipperGUI) graphicsAcquire())
         {
             /// This is where you would update any elements in the gui
             /// such as feeding values to meters.
-
+            gui.sendFeedbackToUI(_max_input, _max_output, frames, _sampleRate);
             graphicsRelease();
         }
     }
 
     override IGraphics createGraphics()
     {
-        return mallocNew!ClipitGUI(this);
+        return mallocNew!ClipperGUI(this);
     }
 
 private:
-    
+   float _sampleRate; 
+   float _max_input, _max_output;
 }
 

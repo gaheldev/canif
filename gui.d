@@ -15,7 +15,7 @@ import visualizer;
 
 // Plugin GUI, based on FlatBackgroundGUI.
 // This allows to use knobs rendered with Knobman
-class ClipitGUI : FlatBackgroundGUI!("background.png",
+class ClipperGUI : FlatBackgroundGUI!("background.png",
 
                                      // In development, enter here the absolute path to the gfx directory.
                                      // This allows to reload background images at debug-time when pressing the RETURN key.
@@ -25,9 +25,9 @@ public:
 nothrow:
 @nogc:
 
-    ClipitClient _client;
+    ClipperClient _client;
 
-    this(ClipitClient client)
+    this(ClipperClient client)
     {
         _client = client;
 
@@ -92,6 +92,12 @@ nothrow:
         _modeSwitch.position = rectangle(380, 28, 50, 20).scaleByFactor(S);
         _resizerHint.position = rectangle(W-30, H-30, 30, 30);
     }
+
+    void sendFeedbackToUI(float max_input, float max_output, int frames, float sampleRate)
+    {
+        _visualizer.sendFeedbackToUI(max_input, max_output, frames, sampleRate);
+    }
+
 
 private:
     UIFilmstripKnob _inputGainKnob;
