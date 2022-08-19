@@ -1,4 +1,4 @@
-module visualizer;
+module waveforms;
 
 import core.stdc.stdio;
 
@@ -12,8 +12,8 @@ import dplug.client;
 
 import std.algorithm;
 
-/// Displays input and clipped output with clipper threshold
-final class UIVisualizer : UIElement, IParameterListener
+/// Displays input and clipped output waveforms
+final class UIWaveforms : UIElement
 {
 public:
 nothrow:
@@ -23,11 +23,9 @@ nothrow:
     enum SAMPLES_TO_DISPLAY = 512;
     enum INPUT_SUBSAMPLING = 1;
 
-    this(UIContext context, Parameter clippingAmount)
+    this(UIContext context)
     {
         super(context, flagRaw | flagAnimated);
-        _clippingAmount = cast(FloatParameter) clippingAmount;
-        _clippingAmount.addListener(this);
         _inputFIFO.initialize(SAMPLES_IN_FIFO,INPUT_SUBSAMPLING);
         _outputFIFO.initialize(SAMPLES_IN_FIFO,INPUT_SUBSAMPLING);
         _inputTempState[] = 0.0f;
@@ -44,7 +42,6 @@ nothrow:
 
     ~this()
     {
-        _clippingAmount.removeListener(this);
     }
 
     override void onAnimate(double dt, double time)
@@ -73,22 +70,11 @@ nothrow:
 
     override void onDrawRaw(ImageRef!RGBA rawMap, box2i[] dirtyRects)
     {
-        float W = position.width;
-        float H = position.height;
-        float center = H * 0.5f;
-
-        float lineWidth = H * 0.01f;
-        float lineH = (center-lineWidth) * _clippingAmount.getNormalized();
-
         foreach (dirtyRect; dirtyRects)
         {
             auto cRaw = rawMap.cropImageRef(dirtyRect);
             canvas.initialize(cRaw);
             canvas.translate(-dirtyRect.min.x, -dirtyRect.min.y);
-
-            canvas.fillStyle = "rgba(238, 124, 62, 90%)";
-            canvas.fillRect(0, lineH, W, lineWidth);
-            canvas.fillRect(0, H-lineH, W, -lineWidth);
 
             /// draw waveform
             for (int i=0; i<SAMPLES_TO_DISPLAY; i++)
@@ -132,21 +118,6 @@ nothrow:
         canvas.fill();
     }
 
-    override void onParameterChanged(Parameter sender)
-    {
-        setDirtyWhole();
-    }
-
-    override void onBeginParameterEdit(Parameter sender)
-    {
-        setDirtyWhole();
-    }
-
-    override void onEndParameterEdit(Parameter sender)
-    {
-        setDirtyWhole();
-    }
-
     void sendFeedbackToUI(float max_input, float max_output, int frames, float sampleRate)
     {
         /// simulate 512 samples -> 2.7s for 48kHz and FIFO of 512 samples
@@ -160,7 +131,6 @@ nothrow:
 
 private:
     Canvas canvas;
-    FloatParameter _clippingAmount;
     TimedFIFO!float _inputFIFO;
     TimedFIFO!float _outputFIFO;
     float[SAMPLES_IN_FIFO] _inputTempState;

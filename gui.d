@@ -11,7 +11,8 @@ import dplug.client;
 import dplug.canvas;
 
 import main;
-import visualizer;
+import waveforms;
+import cliplines;
 
 // Plugin GUI, based on FlatBackgroundGUI.
 // This allows to use knobs rendered with Knobman
@@ -65,8 +66,11 @@ nothrow:
         _mixKnob = mallocNew!UIFilmstripKnob(context(), cast(FloatParameter) _client.param(paramMix), knobImage, numFrames);
         addChild(_mixKnob);
 
-        _visualizer = mallocNew!UIVisualizer(context(), cast(FloatParameter) _client.param(paramClip));
-        addChild(_visualizer);
+        _waveforms = mallocNew!UIWaveforms(context());
+        addChild(_waveforms);
+
+        _cliplines = mallocNew!UICliplines(context(), cast(FloatParameter) _client.param(paramClip));
+        addChild(_cliplines);
 
         addChild(_modeSwitch = mallocNew!UIImageSwitch(context(), cast(BoolParameter) _client.param(paramMode), switchOnImage, switchOffImage));       
 
@@ -87,7 +91,8 @@ nothrow:
         _outputGainKnob.position = rectangle(70, 320, 128, 128).scaleByFactor(S);
         _mixKnob.position        = rectangle(308, 320, 128, 128).scaleByFactor(S);
 
-        _visualizer.position = rectangle(40, 215, 370, 220).scaleByFactor(S);
+        _waveforms.position = rectangle(40, 215, 370, 220).scaleByFactor(S);
+        _cliplines.position = rectangle(40, 215, 370, 220).scaleByFactor(S);
  
         _modeSwitch.position = rectangle(380, 28, 50, 20).scaleByFactor(S);
         _resizerHint.position = rectangle(W-30, H-30, 30, 30);
@@ -95,7 +100,7 @@ nothrow:
 
     void sendFeedbackToUI(float max_input, float max_output, int frames, float sampleRate)
     {
-        _visualizer.sendFeedbackToUI(max_input, max_output, frames, sampleRate);
+        _waveforms.sendFeedbackToUI(max_input, max_output, frames, sampleRate);
     }
 
 
@@ -106,5 +111,6 @@ private:
     UIFilmstripKnob _mixKnob;
     UIImageSwitch   _modeSwitch;
     UIWindowResizer _resizerHint;
-    UIVisualizer    _visualizer;
+    UIWaveforms     _waveforms;
+    UICliplines     _cliplines;
 }
