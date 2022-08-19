@@ -12,13 +12,6 @@ import dplug.client;
 
 import std.algorithm;
 
-/// This widgets demonstrates how to:
-/// - do a custom widget
-/// - use dplug:canvas
-/// - use TimedFIFO for UI feedback with sub-buffer latency
-/// - render to both the Raw and PBR layer
-/// For more custom widget tips, see "Dplug Tutorials 3 - Anatomy of a custom widget".
-
 /// Displays input and clipped output with clipper threshold
 final class UIVisualizer : UIElement, IParameterListener
 {
@@ -26,7 +19,8 @@ public:
 nothrow:
 @nogc:
 
-    enum SAMPLES_IN_FIFO = 512;
+    enum SAMPLES_IN_FIFO = 1024;
+    enum SAMPLES_TO_DISPLAY = 512;
     enum INPUT_SUBSAMPLING = 1;
 
     this(UIContext context, Parameter clippingAmount)
@@ -36,8 +30,16 @@ nothrow:
         _clippingAmount.addListener(this);
         _inputFIFO.initialize(SAMPLES_IN_FIFO,INPUT_SUBSAMPLING);
         _outputFIFO.initialize(SAMPLES_IN_FIFO,INPUT_SUBSAMPLING);
-        _inputStateToDisplay[] = 0.0f;
-        _outputStateToDisplay[] = 0.0f;
+        _inputTempState[] = 0.0f;
+        _outputTempState[] = 0.0f;
+        _stateToDisplay[] = 0.5f;
+        _inputStateToDisplay = makeRingBufferNoGC!float(SAMPLES_TO_DISPLAY);
+        _outputStateToDisplay = makeRingBufferNoGC!float(SAMPLES_TO_DISPLAY);
+        for (int i=0; i<SAMPLES_TO_DISPLAY; i++)
+        {
+            _inputStateToDisplay.pushBack(0.0f);
+            _outputStateToDisplay.pushBack(0.0f);
+        }
     }
 
     ~this()
@@ -48,8 +50,14 @@ nothrow:
     override void onAnimate(double dt, double time)
     {
         bool needRedraw = false;
-        int nbSamplesInput  = _inputFIFO.readOldestDataAndDropSome(_inputStateToDisplay[], dt, SAMPLES_IN_FIFO);
-        int nbSamplesOutput = _outputFIFO.readOldestDataAndDropSome(_outputStateToDisplay[], dt, SAMPLES_IN_FIFO);
+        int nbSamplesInput  = _inputFIFO.readOldestDataAndDropSome(_inputTempState[], dt);
+        int nbSamplesOutput = _outputFIFO.readOldestDataAndDropSome(_outputTempState[], dt);
+
+        for (int i=0; i<nbSamplesInput; i++)
+            _inputStateToDisplay.pushBack(_inputTempState[i]);
+        for (int i=0; i<nbSamplesOutput; i++)
+            _outputStateToDisplay.pushBack(_outputTempState[i]);
+
         if (nbSamplesInput)
         {
             needRedraw = true;
@@ -83,8 +91,13 @@ nothrow:
             canvas.fillRect(0, H-lineH, W, -lineWidth);
 
             /// draw waveform
-            _drawWaveform(_inputStateToDisplay[], RGBA(102,153,255,200));
-            _drawWaveform(_outputStateToDisplay[], RGBA(153,102,255,200));
+            for (int i=0; i<SAMPLES_TO_DISPLAY; i++)
+                _stateToDisplay[i] = _inputStateToDisplay.opIndex(i);
+            _drawWaveform(_stateToDisplay, RGBA(102,153,255,200));
+
+            for (int i=0; i<SAMPLES_TO_DISPLAY; i++)
+                _stateToDisplay[i] = _outputStateToDisplay.opIndex(i);
+            _drawWaveform(_stateToDisplay, RGBA(153,102,255,200));
         }
     }
 
@@ -93,12 +106,12 @@ nothrow:
         float W = position.width;
         float H = position.height;
         float center = H * 0.5f;
-        float wavChunkWidth = W / SAMPLES_IN_FIFO;
+        float wavChunkWidth = W / SAMPLES_TO_DISPLAY;
 
         canvas.fillStyle = fillStyle;
         canvas.beginPath();
         canvas.moveTo(0,center);
-        for (int i=0; i<SAMPLES_IN_FIFO; i++)
+        for (int i=0; i<SAMPLES_TO_DISPLAY; i++)
         {
             float sample = stateToDisplay[i];
             float maxH = center - sample * H/2;
@@ -108,7 +121,7 @@ nothrow:
         }
         canvas.lineTo(W,center);
 
-        for (int i=SAMPLES_IN_FIFO-1; i>=0; i--)
+        for (int i=SAMPLES_TO_DISPLAY-1; i>=0; i--)
         {
             float sample = stateToDisplay[i];
             float minH = center + sample * H/2;
@@ -137,14 +150,12 @@ nothrow:
     void sendFeedbackToUI(float max_input, float max_output, int frames, float sampleRate)
     {
         /// simulate 512 samples -> 2.7s for 48kHz and FIFO of 512 samples
-        assert(frames <= 256);
-        int nbDuplicates = 256 / frames;
+        assert(frames <= 512);
 
-        for (int i=0; i<nbDuplicates; i++)
-        {
-            _inputFIFO.pushData(max_input, sampleRate);
-            _outputFIFO.pushData(max_output, sampleRate);
-        }
+        if (_inputTempBuffer.accumulate(max_input,frames))
+            _inputFIFO.pushData(_inputTempBuffer.nextBuffer(), sampleRate);
+        if (_outputTempBuffer.accumulate(max_output,frames))
+            _outputFIFO.pushData(_outputTempBuffer.nextBuffer(), sampleRate);
     }
 
 private:
@@ -152,6 +163,46 @@ private:
     FloatParameter _clippingAmount;
     TimedFIFO!float _inputFIFO;
     TimedFIFO!float _outputFIFO;
-    float[SAMPLES_IN_FIFO] _inputStateToDisplay;
-    float[SAMPLES_IN_FIFO] _outputStateToDisplay;
+    float[SAMPLES_IN_FIFO] _inputTempState;
+    float[SAMPLES_IN_FIFO] _outputTempState;
+    MaxTrackerBuffer _inputTempBuffer;
+    MaxTrackerBuffer _outputTempBuffer;
+    RingBufferNoGC!float _inputStateToDisplay;
+    RingBufferNoGC!float _outputStateToDisplay;
+    float[SAMPLES_TO_DISPLAY] _stateToDisplay;
+}
+
+struct MaxTrackerBuffer
+{
+public:
+nothrow:
+@nogc:
+
+    bool accumulate(float sample, int frames)
+    {
+        if (_frameCounter==0 || sample > _maxTracker)
+            _maxTracker = sample;
+        _frameCounter += frames;
+        if (_frameCounter >= _bufferSize)
+        {
+            _isReady = true;
+            _max = _maxTracker;
+            _maxTracker = -140.0f;
+            _frameCounter = 0;
+        }
+        return _isReady;
+    }
+
+    float nextBuffer()
+    {
+        return _max;
+    }
+
+private:
+    int _bufferSize = 512;
+    int _frameCounter = 0;
+    float _maxTracker = -140.0f;
+    bool _isReady = false;
+    float _max = -140.0f;
+
 }

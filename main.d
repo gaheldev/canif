@@ -26,7 +26,7 @@ enum : int
     paramMode,
 }
 
-enum MAX_FRAMES_IN_PROCESS = 256;
+enum MAX_FRAMES_IN_PROCESS = 512;
 
 
 /// Example mono/stereo distortion plugin.
