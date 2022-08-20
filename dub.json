@@ -32,7 +32,8 @@
         "dplug:vst3": { "path": "/home/gael/code/audio/Dplug/" },
         "dplug:gui": { "path": "/home/gael/code/audio/Dplug/" },
         "dplug:canvas": { "path": "/home/gael/code/audio/Dplug/" },
-        "dplug:flat-widgets": { "path": "/home/gael/code/audio/Dplug/" }
+        "dplug:flat-widgets": { "path": "/home/gael/code/audio/Dplug/" },
+        "dplug:pbr-widgets": { "path": "/home/gael/code/audio/Dplug/" }
     },
 
     "comment": "Example of configuration options",

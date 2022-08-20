@@ -6,6 +6,7 @@ License:   $(LINK2 http://www.boost.org/LICENSE_1_0.txt, Boost License 1.0)
 module gui;
 
 import dplug.gui;
+import dplug.pbrwidgets;
 import dplug.flatwidgets;
 import dplug.client;
 import dplug.canvas;
@@ -16,7 +17,8 @@ import cliplines;
 
 // Plugin GUI, based on FlatBackgroundGUI.
 // This allows to use knobs rendered with Knobman
-class ClipperGUI : FlatBackgroundGUI!("background.png",
+class ClipperGUI : PBRBackgroundGUI!("basecolor.png", "emissive.png", "material.png",
+                                     "depth.png", "skybox_fireplace.png",
 
                                      // In development, enter here the absolute path to the gfx directory.
                                      // This allows to reload background images at debug-time when pressing the RETURN key.
