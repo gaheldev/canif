@@ -33,7 +33,7 @@ nothrow:
         _client = client;
 
         static immutable float[7] ratios = [0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f];
-        super( makeSizeConstraintsDiscrete(500, 500, ratios) );
+        super( makeSizeConstraintsDiscrete(1000, 600, ratios) );
 
         // Sets the number of pixels recomputed around dirtied controls.
         // Since we aren't using PBR we can set this value to 0 to save
@@ -86,15 +86,15 @@ nothrow:
 
         float S = W / cast(float)(context.getDefaultUIWidth());
 
-        _inputGainKnob.position  = rectangle(70, 101, 128, 128).scaleByFactor(S);
-        _clipKnob.position       = rectangle(308, 101, 128, 128).scaleByFactor(S);
-        _outputGainKnob.position = rectangle(70, 320, 128, 128).scaleByFactor(S);
-        _mixKnob.position        = rectangle(308, 320, 128, 128).scaleByFactor(S);
+        _inputGainKnob.position  = rectangle(840, 40, 120, 120).scaleByFactor(S);
+        _clipKnob.position       = rectangle(840, 246, 120, 120).scaleByFactor(S);
+        _outputGainKnob.position = rectangle(230, 524, 64, 64).scaleByFactor(S);
+        _mixKnob.position        = rectangle(530, 524, 64, 64).scaleByFactor(S);
 
-        _waveforms.position = rectangle(40, 215, 370, 220).scaleByFactor(S);
-        _cliplines.position = rectangle(40, 215, 370, 220).scaleByFactor(S);
+        _waveforms.position = rectangle(35, 40, 740, 428).scaleByFactor(S);
+        _cliplines.position = rectangle(35, 40, 740, 428).scaleByFactor(S);
  
-        _modeSwitch.position = rectangle(380, 28, 50, 20).scaleByFactor(S);
+        _modeSwitch.position = rectangle(814, 542, 80, 34).scaleByFactor(S);
         _resizerHint.position = rectangle(W-30, H-30, 30, 30);
     }
 
