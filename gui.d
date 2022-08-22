@@ -18,7 +18,7 @@ import cliplines;
 // Plugin GUI, based on FlatBackgroundGUI.
 // This allows to use knobs rendered with Knobman
 class ClipperGUI : PBRBackgroundGUI!("basecolor.png", "emissive.png", "material.png",
-                                     "depth.png", "skybox_fireplace.png",
+                                     "depth.png", "skybox_furniture.png",
 
                                      // In development, enter here the absolute path to the gfx directory.
                                      // This allows to reload background images at debug-time when pressing the RETURN key.
