@@ -14,11 +14,9 @@ import dplug.canvas;
 import main;
 import waveforms;
 import cliplines;
+import widgets.flattoggle;
 
-// Plugin GUI, based on FlatBackgroundGUI.
-// This allows to use knobs rendered with Knobman
-class ClipperGUI : PBRBackgroundGUI!("basecolor.png", "emissive.png", "material.png",
-                                     "depth.png", "skybox_furniture.png",
+class ClipperGUI : FlatBackgroundGUI!("background.png",
 
                                      // In development, enter here the absolute path to the gfx directory.
                                      // This allows to reload background images at debug-time when pressing the RETURN key.
@@ -35,7 +33,7 @@ nothrow:
         _client = client;
 
         static immutable float[7] ratios = [0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f];
-        super( makeSizeConstraintsDiscrete(1000, 600, ratios) );
+        super( makeSizeConstraintsDiscrete(920, 480, ratios) );
 
         // Sets the number of pixels recomputed around dirtied controls.
         // Since we aren't using PBR we can set this value to 0 to save
@@ -48,25 +46,29 @@ nothrow:
         // You can avoid resource compilers that way.
         // The only cost is that each resource is in each binary, this creates overhead 
         OwnedImage!RGBA knobImage = loadOwnedImage(cast(ubyte[])(import("knob.png")));
-        OwnedImage!RGBA switchOnImage = loadOwnedImage(cast(ubyte[])(import("switchOn.png")));
-        OwnedImage!RGBA switchOffImage = loadOwnedImage(cast(ubyte[])(import("switchOff.png")));
+        OwnedImage!RGBA softenOnImage = loadOwnedImage(cast(ubyte[])(import("softenOn.png")));
+        OwnedImage!RGBA softenOnHoverImage = loadOwnedImage(cast(ubyte[])(import("softenOnHover.png")));
+        OwnedImage!RGBA softenOffImage = loadOwnedImage(cast(ubyte[])(import("softenOff.png")));
+        OwnedImage!RGBA softenOffHoverImage = loadOwnedImage(cast(ubyte[])(import("softenOffHover.png")));
+        /* OwnedImage!RGBA switchOnImage = loadOwnedImage(cast(ubyte[])(import("switchOn.png"))); */
+        /* OwnedImage!RGBA switchOffImage = loadOwnedImage(cast(ubyte[])(import("switchOff.png"))); */
 
         // Creates all widets and adds them as children to the GUI
         // widgets are not visible until their positions have been set
         int numFrames = 101;
 
-
-        _inputGainKnob = mallocNew!UIFilmstripKnob(context(), cast(FloatParameter) _client.param(paramInputGain), knobImage, numFrames);
-        addChild(_inputGainKnob);
-        
-        _clipKnob = mallocNew!UIFilmstripKnob(context(), cast(FloatParameter) _client.param(paramClip), knobImage, numFrames);
-        addChild(_clipKnob);
-        
-        _outputGainKnob = mallocNew!UIFilmstripKnob(context(), cast(FloatParameter) _client.param(paramOutputGain), knobImage, numFrames);
+        _outputGainKnob = mallocNew!UIFilmstripKnob(context(), 
+                                                    cast(FloatParameter) _client.param(paramOutputGain),
+                                                    knobImage, 
+                                                    numFrames);
         addChild(_outputGainKnob);
-        
-        _mixKnob = mallocNew!UIFilmstripKnob(context(), cast(FloatParameter) _client.param(paramMix), knobImage, numFrames);
+
+        _mixKnob = mallocNew!UIFilmstripKnob(context(), 
+                                             cast(FloatParameter) _client.param(paramMix),
+                                             knobImage, 
+                                             numFrames);
         addChild(_mixKnob);
+
 
         _waveforms = mallocNew!UIWaveforms(context());
         addChild(_waveforms);
@@ -74,9 +76,16 @@ nothrow:
         _cliplines = mallocNew!UICliplines(context(), cast(FloatParameter) _client.param(paramClip));
         addChild(_cliplines);
 
-        addChild(_modeSwitch = mallocNew!UIImageSwitch(context(), cast(BoolParameter) _client.param(paramMode), switchOnImage, switchOffImage));       
+        addChild(_modeToggle = mallocNew!UIImageToggle(context(), cast(BoolParameter) _client.param(paramMode), 
+                                                       softenOnImage, softenOnHoverImage,
+                                                       softenOffImage, softenOffHoverImage));       
 
         addChild(_resizerHint = mallocNew!UIWindowResizer(context()));        
+    }
+
+    ~this()
+    {
+        _knobImageData.destroyFree();
     }
 
     override void reflow()
@@ -88,15 +97,24 @@ nothrow:
 
         float S = W / cast(float)(context.getDefaultUIWidth());
 
-        _inputGainKnob.position  = rectangle(840, 40, 120, 120).scaleByFactor(S);
-        _clipKnob.position       = rectangle(840, 246, 120, 120).scaleByFactor(S);
-        _outputGainKnob.position = rectangle(230, 524, 64, 64).scaleByFactor(S);
-        _mixKnob.position        = rectangle(530, 524, 64, 64).scaleByFactor(S);
+        /* _clipKnob.position       = rectangle(840, 246, 120, 120).scaleByFactor(S); */
+        _outputGainKnob.position = rectangle(270, 408, 60, 60).scaleByFactor(S);
+        _mixKnob.position        = rectangle(404, 408, 60, 60).scaleByFactor(S);
 
-        _waveforms.position = rectangle(35, 40, 740, 428).scaleByFactor(S);
-        _cliplines.position = rectangle(35, 40, 740, 428).scaleByFactor(S);
+        /* RGBA litTrailColor = RGBA(144,192,193,165); */
+        /* _clipKnob.litTrailDiffuse  = litTrailColor; */
+        /* _outputGainKnob.litTrailDiffuse  = litTrailColor; */
+        /* _mixKnob.litTrailDiffuse  = litTrailColor; */
+
+        /* RGBA unlitTrailColor = RGBA(103,129,129,8); */
+        /* _clipKnob.unlitTrailDiffuse  = unlitTrailColor; */
+        /* _outputGainKnob.unlitTrailDiffuse  = unlitTrailColor; */
+        /* _mixKnob.unlitTrailDiffuse  = unlitTrailColor; */
+
+        _waveforms.position = rectangle(30, 76, 770, 268).scaleByFactor(S);
+        _cliplines.position = rectangle(30, 76, 770, 268).scaleByFactor(S);
  
-        _modeSwitch.position = rectangle(814, 542, 80, 34).scaleByFactor(S);
+        _modeToggle.position = rectangle(826, 79, 78, 29).scaleByFactor(S);
         _resizerHint.position = rectangle(W-30, H-30, 30, 30);
     }
 
@@ -107,11 +125,11 @@ nothrow:
 
 
 private:
-    UIFilmstripKnob _inputGainKnob;
-    UIFilmstripKnob _clipKnob;
+    KnobImage _knobImageData;
+    /* UIImageKnob _clipKnob; */
     UIFilmstripKnob _outputGainKnob;
     UIFilmstripKnob _mixKnob;
-    UIImageSwitch   _modeSwitch;
+    UIImageToggle   _modeToggle;
     UIWindowResizer _resizerHint;
     UIWaveforms     _waveforms;
     UICliplines     _cliplines;

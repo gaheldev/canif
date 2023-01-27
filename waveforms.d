@@ -79,11 +79,11 @@ nothrow:
             /// draw waveform
             for (int i=0; i<SAMPLES_TO_DISPLAY; i++)
                 _stateToDisplay[i] = _inputStateToDisplay.opIndex(i);
-            _drawWaveform(_stateToDisplay, RGBA(102,153,255,200));
+            _drawWaveform(_stateToDisplay, RGBA(238,204,211,200));
 
             for (int i=0; i<SAMPLES_TO_DISPLAY; i++)
                 _stateToDisplay[i] = _outputStateToDisplay.opIndex(i);
-            _drawWaveform(_stateToDisplay, RGBA(153,102,255,200));
+            _drawWaveform(_stateToDisplay, RGBA(228,34,136,200));
         }
     }
 
