@@ -1,7 +1,8 @@
 {
 	"fileVersion": 1,
 	"versions": {
-		"dplug": {"path":"/home/gael/code/audio/Dplug/"},
+		"dplug": {"path":"../../Dplug/"},
+		"gamut": "2.0.7",
 		"intel-intrinsics": "1.10.2"
 	}
 }

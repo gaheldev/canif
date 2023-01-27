@@ -65,6 +65,14 @@ nothrow:
         setDirtyWhole(UILayer.rawOnly);
     }
 
+    override void onBeginParameterHover(Parameter sender)
+    {
+    }
+
+    void onEndParameterHover(Parameter sender)
+    {
+    }
+
 private:
     Canvas canvas;
     FloatParameter _clippingAmount;
