@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="13.058906mm"
+   height="3.8586111mm"
+   viewBox="0 0 13.058906 3.8586111"
+   version="1.1"
+   id="svg17490"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="autogainOff.svg"
+   inkscape:export-filename="autogainOff.png"
+   inkscape:export-xdpi="470"
+   inkscape:export-ydpi="470"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview17492"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="6.3620865"
+     inkscape:cx="25.541935"
+     inkscape:cy="22.16254"
+     inkscape:window-width="1366"
+     inkscape:window-height="699"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs17487" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-91.417357,-134.56431)">
+    <rect
+       style="fill:#888888;fill-opacity:1;stroke:#878787;stroke-width:0.324115;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1722-3-6-0-3"
+       width="12.734791"
+       height="3.5344961"
+       x="91.579414"
+       y="134.72636"
+       ry="0.22383836" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.89354px;font-family:'Argentum Sans';-inkscape-font-specification:'Argentum Sans Medium';text-align:center;text-anchor:middle;fill:#e8e8e8;fill-opacity:1;stroke:#080a0b;stroke-width:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       x="107.46878"
+       y="125.21241"
+       id="text2090-6-0-4-0"
+       transform="scale(0.91135056,1.0972726)"><tspan
+         sodipodi:role="line"
+         id="tspan2088-7-6-6-6"
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.89354px;font-family:'Argentum Sans';-inkscape-font-specification:'Argentum Sans Medium';fill:#e8e8e8;fill-opacity:1;stroke:#080a0b;stroke-width:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         x="107.46878"
+         y="125.21241">autogain</tspan></text>
+  </g>
+</svg>

@@ -27,15 +27,15 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="13.625856"
-     inkscape:cx="17.063148"
-     inkscape:cy="14.090858"
+     inkscape:zoom="11.550042"
+     inkscape:cx="18.484781"
+     inkscape:cy="10.216413"
      inkscape:window-width="1366"
      inkscape:window-height="699"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g4879" />
+     inkscape:current-layer="layer1" />
   <defs
      id="defs7506" />
   <g
@@ -43,27 +43,24 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-88.268908,-61.108966)">
-    <g
-       id="g4879">
-      <rect
-         style="fill:#e42288;fill-opacity:1;stroke:#e42288;stroke-width:0.288767;stroke-dasharray:none;stroke-opacity:1"
-         id="rect1722-3-6-5"
-         width="10.011232"
-         height="3.5698011"
-         x="88.413292"
-         y="61.253349"
-         ry="0.2260742" />
-    </g>
+    <rect
+       style="fill:#f0e7e9;fill-opacity:1;stroke:#f0e7e9;stroke-width:0.288767;stroke-dasharray:none;stroke-opacity:1"
+       id="rect1722-3-6-5"
+       width="10.011232"
+       height="3.5698011"
+       x="88.413292"
+       y="61.253349"
+       ry="0.2260742" />
     <text
        xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.89354px;font-family:'Argentum Sans';-inkscape-font-specification:'Argentum Sans Medium';text-align:center;text-anchor:middle;fill:#eeccd3;fill-opacity:1;stroke:#080a0b;stroke-width:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.89354px;font-family:'Argentum Sans';-inkscape-font-specification:'Argentum Sans Medium';text-align:center;text-anchor:middle;fill:#901546;fill-opacity:1;stroke:#080a0b;stroke-width:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        x="102.50044"
        y="58.526985"
        id="text2090-6-0-3"
        transform="scale(0.91135056,1.0972726)"><tspan
          sodipodi:role="line"
          id="tspan2088-7-6-5"
-         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.89354px;font-family:'Argentum Sans';-inkscape-font-specification:'Argentum Sans Medium';fill:#eeccd3;fill-opacity:1;stroke:#080a0b;stroke-width:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:2.89354px;font-family:'Argentum Sans';-inkscape-font-specification:'Argentum Sans Medium';fill:#901546;fill-opacity:1;stroke:#080a0b;stroke-width:0;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
          x="102.50044"
          y="58.526985">soften</tspan></text>
   </g>
