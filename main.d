@@ -19,11 +19,12 @@ mixin(pluginEntryPoints!ClipperClient);
 
 enum : int
 {
-    paramInputGain,
+    paramBypass,
+    paramSoften,
     paramClip,
+    paramAutogain,
     paramOutputGain,
     paramMix,
-    paramMode,
 }
 
 enum MAX_FRAMES_IN_PROCESS = 512;
@@ -55,11 +56,12 @@ nothrow:
     override Parameter[] buildParameters()
     {
         auto params = makeVec!Parameter();
-        params ~= mallocNew!LinearFloatParameter(paramInputGain, "input gain", "dB", -12.0f, 12.0f, 0.0f) ;
+        params ~= mallocNew!BoolParameter(paramBypass, "bypass", false);
+        params ~= mallocNew!BoolParameter(paramSoften, "soften", false);
         params ~= mallocNew!LinearFloatParameter(paramClip, "clip", "%", 0.0f, 100.0f, 0.0f) ;
+        params ~= mallocNew!BoolParameter(paramAutogain, "autogain", false);
         params ~= mallocNew!LinearFloatParameter(paramOutputGain, "output gain", "db", -12.0f, 12.0f, 0.0f) ;
         params ~= mallocNew!LinearFloatParameter(paramMix, "mix", "%", 0.0f, 100.0f, 100.0f) ;
-        params ~= mallocNew!BoolParameter(paramMode, "mode", false);
         return params.releaseData();
     }
 
@@ -108,49 +110,56 @@ nothrow:
 
         /// Read parameter values
         /// Convert decibel values to floating point
-        immutable float inputGain = pow(10, readParam!float(paramInputGain) /20);
-        immutable float outputGain = pow(10, readParam!float(paramOutputGain) /20);
+        float outputGain = pow(10, readParam!float(paramOutputGain) /20);
 
         immutable float mix = readParam!float(paramMix) / 100.0f;
 
-        immutable bool hardClip = readParam!bool(paramMode);
+        immutable bool softClip = readParam!bool(paramSoften);
+
+        immutable bool bypass = readParam!bool(paramBypass);
+
+        immutable bool autogain = readParam!bool(paramAutogain);
 
         float clipAmount;
         float clipInv;
-        if(hardClip)
+        if(softClip)
+        {
+            clipAmount = readParam!float(paramClip) / 3;
+            clipInv = 1 / clipAmount;
+            /// TODO: compute autogain for soft clipping
+        }
+        else
         {
             clipAmount = 1 - (readParam!float(paramClip) / 100.0f);
             /// Clamp clipAmount to ensure it is never 0
             clipAmount = clamp(clipAmount, 0.1, 1);
-        }
-        else
-        {
-            clipAmount = readParam!float(paramClip) / 3;
-            clipInv = 1 / clipAmount;
+            if (autogain)
+                outputGain = 1 / clipAmount;
         }
 
         for (int chan = 0; chan < minChan; ++chan)
         {
             for (int f = 0; f < frames; ++f)
             {
-                float inputSample = inputs[chan][f] * inputGain;
+                float inputSample = inputs[chan][f];
 
                 float outputSample = inputSample;
 
-                /// Hard clip mode
-                if(hardClip)
+                /// TODO: crossover between input and output
+                if (bypass)
+                    continue;
+
+                if(softClip)
+                {
+                    if(clipAmount > 0)
+                        outputSample = clipInv * atan( outputSample * clipAmount);
+                }
+                else
                 {
                     if(outputSample > clipAmount)
                         outputSample = clipAmount;
                     if(outputSample < -clipAmount)
                         outputSample = -clipAmount;
-                }
-                /// Soft clip mode
-                else
-                {
-                    /// Clip the signal
-                    if(clipAmount > 0)
-                        outputSample = clipInv * atan( outputSample * clipAmount);
                 }
 
                 outputs[chan][f] = ((outputSample * mix) + (inputSample * (1 - mix))) * outputGain;

@@ -50,8 +50,16 @@ nothrow:
         OwnedImage!RGBA softenOnHoverImage = loadOwnedImage(cast(ubyte[])(import("softenOnHover.png")));
         OwnedImage!RGBA softenOffImage = loadOwnedImage(cast(ubyte[])(import("softenOff.png")));
         OwnedImage!RGBA softenOffHoverImage = loadOwnedImage(cast(ubyte[])(import("softenOffHover.png")));
-        /* OwnedImage!RGBA switchOnImage = loadOwnedImage(cast(ubyte[])(import("switchOn.png"))); */
-        /* OwnedImage!RGBA switchOffImage = loadOwnedImage(cast(ubyte[])(import("switchOff.png"))); */
+
+        OwnedImage!RGBA bypassOnImage = loadOwnedImage(cast(ubyte[])(import("bypassOn.png")));
+        OwnedImage!RGBA bypassOnHoverImage = loadOwnedImage(cast(ubyte[])(import("bypassOnHover.png")));
+        OwnedImage!RGBA bypassOffImage = loadOwnedImage(cast(ubyte[])(import("bypassOff.png")));
+        OwnedImage!RGBA bypassOffHoverImage = loadOwnedImage(cast(ubyte[])(import("bypassOffHover.png")));
+
+        OwnedImage!RGBA autogainOnImage = loadOwnedImage(cast(ubyte[])(import("autogainOn.png")));
+        OwnedImage!RGBA autogainOnHoverImage = loadOwnedImage(cast(ubyte[])(import("autogainOnHover.png")));
+        OwnedImage!RGBA autogainOffImage = loadOwnedImage(cast(ubyte[])(import("autogainOff.png")));
+        OwnedImage!RGBA autogainOffHoverImage = loadOwnedImage(cast(ubyte[])(import("autogainOffHover.png")));
 
         // Creates all widets and adds them as children to the GUI
         // widgets are not visible until their positions have been set
@@ -76,9 +84,17 @@ nothrow:
         _cliplines = mallocNew!UICliplines(context(), cast(FloatParameter) _client.param(paramClip));
         addChild(_cliplines);
 
-        addChild(_modeToggle = mallocNew!UIImageToggle(context(), cast(BoolParameter) _client.param(paramMode), 
+        addChild(_softenToggle = mallocNew!UIImageToggle(context(), cast(BoolParameter) _client.param(paramSoften),
                                                        softenOnImage, softenOnHoverImage,
-                                                       softenOffImage, softenOffHoverImage));       
+                                                       softenOffImage, softenOffHoverImage));
+
+        addChild(_bypassToggle = mallocNew!UIImageToggle(context(), cast(BoolParameter) _client.param(paramBypass),
+                                                       bypassOnImage, bypassOnHoverImage,
+                                                       bypassOffImage, bypassOffHoverImage));
+
+        addChild(_autogainToggle = mallocNew!UIImageToggle(context(), cast(BoolParameter) _client.param(paramAutogain),
+                                                       autogainOnImage, autogainOnHoverImage,
+                                                       autogainOffImage, autogainOffHoverImage));
 
         addChild(_resizerHint = mallocNew!UIWindowResizer(context()));        
     }
@@ -114,7 +130,9 @@ nothrow:
         _waveforms.position = rectangle(30, 76, 770, 268).scaleByFactor(S);
         _cliplines.position = rectangle(30, 76, 770, 268).scaleByFactor(S);
  
-        _modeToggle.position = rectangle(826, 79, 78, 29).scaleByFactor(S);
+        _softenToggle.position = rectangle(826, 79, 78, 29).scaleByFactor(S);
+        _bypassToggle.position = rectangle(192, 18, 78, 29).scaleByFactor(S);
+        _autogainToggle.position = rectangle(48, 424, 99, 29).scaleByFactor(S);
         _resizerHint.position = rectangle(W-30, H-30, 30, 30);
     }
 
@@ -129,7 +147,9 @@ private:
     /* UIImageKnob _clipKnob; */
     UIFilmstripKnob _outputGainKnob;
     UIFilmstripKnob _mixKnob;
-    UIImageToggle   _modeToggle;
+    UIImageToggle   _softenToggle;
+    UIImageToggle   _bypassToggle;
+    UIImageToggle   _autogainToggle;
     UIWindowResizer _resizerHint;
     UIWaveforms     _waveforms;
     UICliplines     _cliplines;
