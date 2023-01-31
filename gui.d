@@ -15,6 +15,7 @@ import main;
 import waveforms;
 import cliplines;
 import widgets.flattoggle;
+import widgets.slider;
 
 class ClipperGUI : FlatBackgroundGUI!("background.png",
 
@@ -61,6 +62,10 @@ nothrow:
         OwnedImage!RGBA autogainOffImage = loadOwnedImage(cast(ubyte[])(import("autogainOff.png")));
         OwnedImage!RGBA autogainOffHoverImage = loadOwnedImage(cast(ubyte[])(import("autogainOffHover.png")));
 
+        OwnedImage!RGBA sliderImage = loadOwnedImage(cast(ubyte[])(import("slider.png")));
+        OwnedImage!RGBA sliderHoverImage = loadOwnedImage(cast(ubyte[])(import("sliderHover.png")));
+        OwnedImage!RGBA sliderGrabImage = loadOwnedImage(cast(ubyte[])(import("sliderGrab.png")));
+
         // Creates all widets and adds them as children to the GUI
         // widgets are not visible until their positions have been set
         int numFrames = 101;
@@ -95,6 +100,9 @@ nothrow:
         addChild(_autogainToggle = mallocNew!UIImageToggle(context(), cast(BoolParameter) _client.param(paramAutogain),
                                                        autogainOnImage, autogainOnHoverImage,
                                                        autogainOffImage, autogainOffHoverImage));
+
+        addChild(_clipSlider = mallocNew!UIFlatSlider(context(), cast(LinearFloatParameter) _client.param(paramClip),
+                                                       sliderImage, sliderHoverImage, sliderGrabImage));
 
         addChild(_resizerHint = mallocNew!UIWindowResizer(context()));        
     }
@@ -133,6 +141,9 @@ nothrow:
         _softenToggle.position = rectangle(826, 79, 78, 29).scaleByFactor(S);
         _bypassToggle.position = rectangle(192, 18, 78, 29).scaleByFactor(S);
         _autogainToggle.position = rectangle(48, 424, 99, 29).scaleByFactor(S);
+
+        _clipSlider.position = rectangle(854, 331, 24, 24).scaleByFactor(S);
+
         _resizerHint.position = rectangle(W-30, H-30, 30, 30);
     }
 
@@ -143,13 +154,13 @@ nothrow:
 
 
 private:
-    KnobImage _knobImageData;
-    /* UIImageKnob _clipKnob; */
+    KnobImage       _knobImageData;
     UIFilmstripKnob _outputGainKnob;
     UIFilmstripKnob _mixKnob;
     UIImageToggle   _softenToggle;
     UIImageToggle   _bypassToggle;
     UIImageToggle   _autogainToggle;
+    UIFlatSlider    _clipSlider;
     UIWindowResizer _resizerHint;
     UIWaveforms     _waveforms;
     UICliplines     _cliplines;

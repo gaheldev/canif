@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="3.427175mm"
+   height="3.427175mm"
+   viewBox="0 0 3.427175 3.427175"
+   version="1.1"
+   id="svg47836"
+   inkscape:export-filename="sliderGrabbed.png"
+   inkscape:export-xdpi="400"
+   inkscape:export-ydpi="400"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="sliderGrabbed.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview47838"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="20.738532"
+     inkscape:cx="9.7644325"
+     inkscape:cy="5.3523556"
+     inkscape:window-width="1366"
+     inkscape:window-height="699"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs47833" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-57.686414,-70.956624)">
+    <circle
+       style="fill:#404040;fill-opacity:1;stroke:#ffa23e;stroke-width:0;stroke-linecap:round;stroke-linejoin:miter;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path47738-2"
+       cx="59.400002"
+       cy="72.670212"
+       r="1.713587" />
+  </g>
+</svg>
