@@ -142,7 +142,7 @@ nothrow:
         _bypassToggle.position = rectangle(192, 18, 78, 29).scaleByFactor(S);
         _autogainToggle.position = rectangle(48, 424, 99, 29).scaleByFactor(S);
 
-        _clipSlider.position = rectangle(854, 331, 25, 25).scaleByFactor(S);
+        _clipSlider.position = rectangle(854, 120, 25, 230).scaleByFactor(S);
 
         _resizerHint.position = rectangle(W-30, H-30, 30, 30);
     }

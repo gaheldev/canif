@@ -15,19 +15,13 @@ import dplug.core.math;
 import dplug.gui.bufferedelement;
 import dplug.client.params;
 
+import dplug.graphics.color;
+
 class UIFlatSlider : UIElement, IParameterListener
 {
 public:
 nothrow:
 @nogc:
-
-    enum Direction
-    {
-        vertical,
-        horizontal
-    }
-
-    @ScriptProperty Direction direction = Direction.vertical;
 
     this(UIContext context, 
             LinearFloatParameter param, 
@@ -41,30 +35,34 @@ nothrow:
         _param.addListener(this);
         _sensivity = sensitivity;
 
-        _slider = sliderImage;
-        _sliderHover = sliderHoverImage;
-        _sliderGrab = sliderGrabImage;
-        assert(_slider.h == _sliderHover.h);
-        assert(_slider.w == _sliderHover.w);
-        assert(_slider.h == _sliderGrab.h);
-        assert(_slider.w == _sliderGrab.w);
-        _width = _slider.w;
-        _height = _slider.h;
+        _width = position.width;
+        _height = position.height;
+
+        _handle = sliderImage;
+        _handleHover = sliderHoverImage;
+        _handleGrab = sliderGrabImage;
+        assert(_handle.h == _handleHover.h);
+        assert(_handle.w == _handleHover.w);
+        assert(_handle.h == _handleGrab.h);
+        assert(_handle.w == _handleGrab.w);
 
         _hover = false;
         _hold = false;
 
-        _sliderScaled = mallocNew!(OwnedImage!RGBA)();
-        _sliderHoverScaled = mallocNew!(OwnedImage!RGBA)();
-        _sliderGrabScaled = mallocNew!(OwnedImage!RGBA)();
+        _sliderImage = mallocNew!(OwnedImage!RGBA)();
+
+        _handleScaled = mallocNew!(OwnedImage!RGBA)();
+        _handleHoverScaled = mallocNew!(OwnedImage!RGBA)();
+        _handleGrabScaled = mallocNew!(OwnedImage!RGBA)();
     }
 
     ~this()
     {
         _param.removeListener(this);
-        _sliderScaled.destroyFree();
-        _sliderHoverScaled.destroyFree();
-        _sliderGrabScaled.destroyFree();
+        _sliderImage.destroyFree();
+        _handleScaled.destroyFree();
+        _handleHoverScaled.destroyFree();
+        _handleGrabScaled.destroyFree();
     }
 
     /// Returns: sensivity.
@@ -79,19 +77,44 @@ nothrow:
         return _sensivity = sensivity;
     }
 
+    void drawSliderImage(float y)
+    {
+        OwnedImage!RGBA _currentHandleImage;
+        if(_hold)
+            _currentHandleImage = _handleGrabScaled;
+        else if(_hover)
+            _currentHandleImage = _handleHoverScaled;
+        else
+            _currentHandleImage = _handleScaled;
+        
+        int startingLine = cast(int) y;
+        int endingLine = startingLine + _currentHandleImage.h;
+        for(int j = 0; j < position.height; ++j)
+        {
+            RGBA[] output = _sliderImage.scanline(j);
+            ulong w = position.width;
+            if (j < startingLine || j >= endingLine)
+                output[0..w] = alpha;
+            else
+            {
+                RGBA[] input = _currentHandleImage.scanline(j-startingLine);
+                output[0..w] = input[0..w];
+            }
+        }
+    }
+
     override void onDrawRaw(ImageRef!RGBA rawMap, box2i[] dirtyRects)
     {
-        OwnedImage!RGBA _currentImage;
-        if(_hold)
-            _currentImage = _sliderGrabScaled;
-        else if(_hover)
-            _currentImage = _sliderHoverScaled;
-        else
-            _currentImage = _sliderScaled;
+        /* float yMin = cast(float) position.min.y; */
+        /* float yMax = cast(float) position.max.y; */
+        /* float y = (1 - _param.getNormalized()) * (yMax - yMin) + yMin; */
+        float y = (1 - _param.getNormalized()) * cast(float) (position.height - _handleScaled.h);
+
+        drawSliderImage(y);
 
         foreach(dirtyRect; dirtyRects)
         {
-            ImageRef!RGBA croppedRawIn = _currentImage.toRef.cropImageRef(dirtyRect);
+            ImageRef!RGBA croppedRawIn = _sliderImage.toRef.cropImageRef(dirtyRect);
             ImageRef!RGBA croppedRawOut = rawMap.cropImageRef(dirtyRect);
 
             int w = dirtyRect.width;
@@ -113,14 +136,15 @@ nothrow:
 
     override void reflow()
     {
+        _sliderImage.size(position.width,position.height);
+
         int W = position.width;
-        int H = position.height;
-        _sliderScaled.size(W,H);
-        _sliderHoverScaled.size(W,H);
-        _sliderGrabScaled.size(W,H);
-        context.globalImageResizer.resizeImage_sRGBWithAlpha(_slider.toRef, _sliderScaled.toRef);
-        context.globalImageResizer.resizeImage_sRGBWithAlpha(_sliderHover.toRef, _sliderHoverScaled.toRef);
-        context.globalImageResizer.resizeImage_sRGBWithAlpha(_sliderGrab.toRef, _sliderGrabScaled.toRef);
+        _handleScaled.size(W,W);
+        _handleHoverScaled.size(W,W);
+        _handleGrabScaled.size(W,W);
+        context.globalImageResizer.resizeImage_sRGBWithAlpha(_handle.toRef, _handleScaled.toRef);
+        context.globalImageResizer.resizeImage_sRGBWithAlpha(_handleHover.toRef, _handleHoverScaled.toRef);
+        context.globalImageResizer.resizeImage_sRGBWithAlpha(_handleGrab.toRef, _handleGrabScaled.toRef);
     }  
 
     override Click onMouseClick(int x, int y, int button, bool isDoubleClick, MouseState mstate)
@@ -140,60 +164,52 @@ nothrow:
     override void onMouseDrag(int x, int y, int dx, int dy, MouseState mstate)
     {
         /* // FUTURE: replace by actual trail height instead of total height */
-        /* float referenceCoord; */
-        /* float displacementInHeight; */
-        /* if (direction == Direction.vertical) */
-        /* { */
-        /*     referenceCoord = y; */
-        /*     displacementInHeight = cast(float)(dy) / _position.height; */
-        /* } */
-        /* else */
-        /* { */
-        /*     referenceCoord = -x; */
-        /*     displacementInHeight = cast(float)(-dx) / _position.width; */
-        /* } */
-        /*  */
-        /* float modifier = 1.0f; */
-        /* if (mstate.shiftPressed || mstate.ctrlPressed) */
-        /*     modifier *= 0.1f; */
-        /*  */
-        /* double oldParamValue = _param.getNormalized(); */
-        /* double newParamValue = oldParamValue - displacementInHeight * modifier * _sensivity; */
-        /* if (mstate.altPressed) */
-        /*     newParamValue = _param.getNormalizedDefault(); */
-        /*  */
-        /* if (referenceCoord > _mousePosOnLast0Cross) */
-        /*     return; */
-        /* if (referenceCoord < _mousePosOnLast1Cross) */
-        /*     return; */
-        /*  */
-        /* if (newParamValue <= 0 && oldParamValue > 0) */
-        /*     _mousePosOnLast0Cross = referenceCoord; */
-        /*  */
-        /* if (newParamValue >= 1 && oldParamValue < 1) */
-        /*     _mousePosOnLast1Cross = referenceCoord; */
-        /*  */
-        /* if (newParamValue < 0) */
-        /*     newParamValue = 0; */
-        /* if (newParamValue > 1) */
-        /*     newParamValue = 1; */
-        /*  */
-        /* if (newParamValue > 0) */
-        /*     _mousePosOnLast0Cross = float.infinity; */
-        /*  */
-        /* if (newParamValue < 1) */
-        /*     _mousePosOnLast1Cross = -float.infinity; */
-        /*  */
-        /* if (newParamValue != oldParamValue) */
-        /* { */
-        /*     if (auto p = cast(FloatParameter)_param) */
-        /*     { */
-        /*         p.setFromGUINormalized(newParamValue); */
-        /*     } */
-        /*     else */
-        /*         assert(false); // only integer and float parameters supported */
-        /* } */
-        /* setDirtyWhole(); */
+        float referenceCoord;
+        float displacementInHeight;
+        referenceCoord = y;
+        displacementInHeight = cast(float)(dy) / position.height;
+        
+        float modifier = 1.0f;
+        if (mstate.shiftPressed || mstate.ctrlPressed)
+            modifier *= 0.1f;
+        
+        double oldParamValue = _param.getNormalized();
+        double newParamValue = oldParamValue - displacementInHeight * modifier * _sensivity;
+        if (mstate.altPressed)
+            newParamValue = _param.getNormalizedDefault();
+        
+        if (referenceCoord > _mousePosOnLast0Cross)
+            return;
+        if (referenceCoord < _mousePosOnLast1Cross)
+            return;
+        
+        if (newParamValue <= 0 && oldParamValue > 0)
+            _mousePosOnLast0Cross = referenceCoord;
+        
+        if (newParamValue >= 1 && oldParamValue < 1)
+            _mousePosOnLast1Cross = referenceCoord;
+        
+        if (newParamValue < 0)
+            newParamValue = 0;
+        if (newParamValue > 1)
+            newParamValue = 1;
+        
+        if (newParamValue > 0)
+            _mousePosOnLast0Cross = float.infinity;
+        
+        if (newParamValue < 1)
+            _mousePosOnLast1Cross = -float.infinity;
+        
+        if (newParamValue != oldParamValue)
+        {
+            if (auto p = cast(FloatParameter)_param)
+            {
+                p.setFromGUINormalized(newParamValue);
+            }
+            else
+                assert(false); // only integer and float parameters supported
+        }
+        setDirtyWhole();
     }
 
     // For lazy updates
@@ -258,13 +274,15 @@ protected:
     int _width;
     int _height;
 
-    OwnedImage!RGBA _slider;
-    OwnedImage!RGBA _sliderHover;
-    OwnedImage!RGBA _sliderGrab;
+    OwnedImage!RGBA _sliderImage;
 
-    OwnedImage!RGBA _sliderScaled;
-    OwnedImage!RGBA _sliderHoverScaled;
-    OwnedImage!RGBA _sliderGrabScaled;
+    OwnedImage!RGBA _handle;
+    OwnedImage!RGBA _handleHover;
+    OwnedImage!RGBA _handleGrab;
+
+    OwnedImage!RGBA _handleScaled;
+    OwnedImage!RGBA _handleHoverScaled;
+    OwnedImage!RGBA _handleGrabScaled;
 
     /// Sensivity: given a mouse movement in 100th of the height of the knob,
     /// how much should the normalized parameter change.
@@ -280,4 +298,5 @@ protected:
         _mousePosOnLast0Cross = float.infinity;
         _mousePosOnLast1Cross = -float.infinity;
     }
+    RGBA alpha = RGBA(0,0,0,0);
 }
