@@ -87,17 +87,40 @@ nothrow:
         else
             _currentHandleImage = _handleScaled;
         
-        int startingLine = cast(int) y;
-        int endingLine = startingLine + _currentHandleImage.h;
+        int handleStartingLineY = cast(int) y;
+        int handleEndingLineY = handleStartingLineY + _currentHandleImage.h;
+
+        // slider bar is 7px wide
+        // we want to center it compared to the image width and color it below the clip handle
+        // -> from 9px/25px to 16px/25px
+        int barStartRow = 9 * position.width / 25;
+        int barEndRow = 16 * position.width / 25;
+
+        // last 4 pixels are already colored in background for a nice rounded effect
+        // 4 pixels / 224 pixels
+        int bottomRoundedCornerLine = position.height - 4 * position.height / 224;
+
         for(int j = 0; j < position.height; ++j)
         {
             RGBA[] output = _sliderImage.scanline(j);
             ulong w = position.width;
-            if (j < startingLine || j >= endingLine)
+            if (j < handleStartingLineY)
+            {
                 output[0..w] = alpha;
+            }
+            else if (j >= handleEndingLineY && j < bottomRoundedCornerLine)
+            {
+                output[0..barStartRow] = alpha;
+                output[barStartRow..barEndRow] = trailColor;
+                output[barEndRow..w] = alpha; 
+            }
+            else if (j >= handleEndingLineY && j >= bottomRoundedCornerLine)
+            {
+                output[0..w] = alpha;
+            }
             else
             {
-                RGBA[] input = _currentHandleImage.scanline(j-startingLine);
+                RGBA[] input = _currentHandleImage.scanline(j-handleStartingLineY);
                 output[0..w] = input[0..w];
             }
         }
@@ -299,4 +322,5 @@ protected:
         _mousePosOnLast1Cross = -float.infinity;
     }
     RGBA alpha = RGBA(0,0,0,0);
+    RGBA trailColor = RGBA(0xdd,0xbd,0xc3,0xff);
 }
