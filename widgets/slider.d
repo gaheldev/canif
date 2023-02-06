@@ -93,12 +93,12 @@ nothrow:
         // slider bar is 7px wide
         // we want to center it compared to the image width and color it below the clip handle
         // -> from 9px/25px to 16px/25px
-        int barStartRow = 9 * position.width / 25;
-        int barEndRow = 16 * position.width / 25;
+        int barStartRow = cast(int) floor(9.0f * position.width / 25.0f);
+        int barEndRow = cast(int) ceil(16.0f * position.width / 25.0f);
 
         // last 4 pixels are already colored in background for a nice rounded effect
         // 4 pixels / 224 pixels
-        int bottomRoundedCornerLine = position.height - 4 * position.height / 224;
+        int bottomRoundedCornerLine = cast(int) floor(cast(float)position.height - 4.0f * position.height / 224.0f);
 
         for(int j = 0; j < position.height; ++j)
         {
