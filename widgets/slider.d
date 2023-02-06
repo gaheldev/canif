@@ -87,8 +87,9 @@ nothrow:
         else
             _currentHandleImage = _handleScaled;
         
-        int handleStartingLineY = cast(int) y;
-        int handleEndingLineY = handleStartingLineY + _currentHandleImage.h;
+        int handleStartingLine = cast(int) y;
+        int handleEndingLine = handleStartingLine + _currentHandleImage.h;
+        int handleCenterLine = (handleStartingLine + handleEndingLine) / 2;
 
         // slider bar is 7px wide
         // we want to center it compared to the image width and color it below the clip handle
@@ -104,24 +105,26 @@ nothrow:
         {
             RGBA[] output = _sliderImage.scanline(j);
             ulong w = position.width;
-            if (j < handleStartingLineY)
-            {
-                output[0..w] = alpha;
-            }
-            else if (j >= handleEndingLineY && j < bottomRoundedCornerLine)
-            {
-                output[0..barStartRow] = alpha;
+
+            output[0..w] = alpha;
+
+            if (j >= handleCenterLine && j < bottomRoundedCornerLine)
                 output[barStartRow..barEndRow] = trailColor;
-                output[barEndRow..w] = alpha; 
-            }
-            else if (j >= handleEndingLineY && j >= bottomRoundedCornerLine)
+
+            if (j >= handleStartingLine && j < handleEndingLine)
             {
-                output[0..w] = alpha;
-            }
-            else
-            {
-                RGBA[] input = _currentHandleImage.scanline(j-handleStartingLineY);
+                RGBA[] input = _currentHandleImage.scanline(j-handleStartingLine);
                 output[0..w] = input[0..w];
+
+                // make sure slider bar is colored till the bottom of the handle
+                if (j >= handleCenterLine)
+                {
+                    for(int i = barStartRow; i < barEndRow; ++i)
+                    {
+                        ubyte alpha = input[i].a;
+                        output[i] = blendColor(output[i], trailColor, alpha);
+                    }
+                }
             }
         }
     }
